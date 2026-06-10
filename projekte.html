@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beispielprojekte — ORBIT Immobilienrechner</title>
+  <meta name="description" content="Drei realistische Beispiel-Immobilienprojekte, komplett durchgerechnet.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='38' fill='none' stroke='%23e3b95c' stroke-width='6'/><circle cx='50' cy='12' r='9' fill='%23e3b95c'/></svg>">
+</head>
+<body>
+<div class="stars" aria-hidden="true"></div>
+
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <a class="logo" href="index.html"><span class="logo-dot" aria-hidden="true"></span>ORBIT</a>
+    <div class="nav-links">
+      <a href="index.html">Start</a>
+      <a href="rechner.html">Rechner</a>
+      <a href="projekte.html" class="active">Projekte</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" style="padding: 70px 0 40px;">
+  <div class="wrap">
+    <p class="eyebrow">Logbuch</p>
+    <h1 style="font-size: clamp(2rem, 5vw, 3rem);">Beispielprojekte</h1>
+    <p class="lead">Drei fiktive, aber realistische Objekte — von konservativ bis renditestark. Alle Zahlen stammen aus unseren Rechnern.</p>
+  </div>
+</header>
+
+<main class="section" style="border-top: none; padding-top: 20px;">
+  <div class="wrap">
+
+    <article class="project reveal" id="ottensen">
+      <div>
+        <span class="p-tag">Projekt A · Bestandshalten</span>
+        <h3>Altbauwohnung, Hamburg-Ottensen</h3>
+        <p class="p-desc">
+          68 m² Gründerzeitwohnung, 3. OG, vermietet für 16,50 €/m². Kaufpreis 510.000 € plus
+          11,1 % Nebenkosten (Hamburg: 5,5 % Grunderwerbsteuer, 2 % Notar/Grundbuch, 3,57 % Makler).
+          Klassisches A-Lage-Profil: Der Faktor 27 drückt die Rendite, dafür spricht die Lagequalität
+          für stabile Vermietbarkeit und langfristiges Wertsteigerungspotenzial. Der Cashflow ist bei
+          80 % Finanzierung leicht negativ — ein Investment, das man aus Überzeugung in die Lage hält,
+          nicht für die monatliche Ausschüttung.
+        </p>
+      </div>
+      <div class="p-metrics">
+        <div class="p-metric"><div class="mk">Kaufpreis</div><div class="mv">510.000 €</div></div>
+        <div class="p-metric"><div class="mk">Gesamtinvestition</div><div class="mv">566.610 €</div></div>
+        <div class="p-metric"><div class="mk">Kaltmiete / Monat</div><div class="mv">1.122 €</div></div>
+        <div class="p-metric"><div class="mk">Kaufpreisfaktor</div><div class="mv">27,3</div></div>
+        <div class="p-metric"><div class="mk">Bruttorendite</div><div class="mv gold">2,64 %</div></div>
+        <div class="p-metric"><div class="mk">Cashflow / Monat</div><div class="mv" style="color:#e07a6a;">−612 €</div></div>
+      </div>
+    </article>
+
+    <article class="project reveal" id="leipzig">
+      <div>
+        <span class="p-tag">Projekt B · Ausgewogen</span>
+        <h3>Neubau-Eigentumswohnung, Leipzig</h3>
+        <p class="p-desc">
+          54 m² Erstbezug im Leipziger Osten, energieeffizienter Neubau, vermietet für 13 €/m².
+          Kaufpreis 265.000 € plus 8,5 % Nebenkosten (Sachsen: 5,5 % GrESt bis 2025 reduziert auf
+          gerechnete 5,0 %*, provisionsfrei vom Bauträger). Geringe Instandhaltung in den ersten
+          Jahren, planbare Kosten und ein nahezu ausgeglichener Cashflow bei 85 % Finanzierung.
+          Der typische Mittelweg: weniger Rendite-Fantasie als C-Lage, weniger Klumpenrisiko als Altbau.
+        </p>
+      </div>
+      <div class="p-metrics">
+        <div class="p-metric"><div class="mk">Kaufpreis</div><div class="mv">265.000 €</div></div>
+        <div class="p-metric"><div class="mk">Gesamtinvestition</div><div class="mv">287.525 €</div></div>
+        <div class="p-metric"><div class="mk">Kaltmiete / Monat</div><div class="mv">702 €</div></div>
+        <div class="p-metric"><div class="mk">Kaufpreisfaktor</div><div class="mv">31,5*</div></div>
+        <div class="p-metric"><div class="mk">Bruttorendite</div><div class="mv gold">3,18 %</div></div>
+        <div class="p-metric"><div class="mk">Cashflow / Monat</div><div class="mv" style="color:#e07a6a;">−248 €</div></div>
+      </div>
+    </article>
+
+    <article class="project reveal" id="ruhr">
+      <div>
+        <span class="p-tag">Projekt C · Renditestark</span>
+        <h3>Mehrfamilienhaus, Gelsenkirchen</h3>
+        <p class="p-desc">
+          6 Wohneinheiten, 380 m² Gesamtfläche, vollvermietet zu durchschnittlich 7,80 €/m².
+          Kaufpreis 420.000 € plus 12,1 % Nebenkosten (NRW: 6,5 % GrESt). Faktor 11,8 — hier
+          arbeitet das Objekt vom ersten Monat an: deutlich positiver Cashflow auch nach Rate,
+          Verwaltung und großzügiger Instandhaltungsrücklage. Dafür trägt man Standortrisiko,
+          Mieterwechsel und ein Gebäude, das aktive Bewirtschaftung verlangt. Rendite ist hier
+          die Bezahlung für Arbeit und Risiko.
+        </p>
+      </div>
+      <div class="p-metrics">
+        <div class="p-metric"><div class="mk">Kaufpreis</div><div class="mv">420.000 €</div></div>
+        <div class="p-metric"><div class="mk">Gesamtinvestition</div><div class="mv">470.820 €</div></div>
+        <div class="p-metric"><div class="mk">Kaltmiete / Monat</div><div class="mv">2.964 €</div></div>
+        <div class="p-metric"><div class="mk">Kaufpreisfaktor</div><div class="mv">11,8</div></div>
+        <div class="p-metric"><div class="mk">Bruttorendite</div><div class="mv gold">8,47 %</div></div>
+        <div class="p-metric"><div class="mk">Cashflow / Monat</div><div class="mv" style="color:#8fd49a;">+486 €</div></div>
+      </div>
+    </article>
+
+    <div class="cta-row" style="margin-top: 50px;">
+      <a class="btn primary" href="rechner.html">Eigenes Projekt durchrechnen</a>
+    </div>
+    <p class="res-note" style="text-align:center; margin-top: 24px;">
+      * Vereinfachte Beispielrechnungen mit fiktiven Objekten. Steuersätze und Marktwerte können abweichen — bitte vor einer Entscheidung individuell prüfen.
+    </p>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <span>ORBIT — Immobilienrechner. Alle Angaben ohne Gewähr, keine Anlage- oder Steuerberatung.</span>
+    <span><a href="index.html">Start</a> · <a href="rechner.html">Rechner</a></span>
+  </div>
+</footer>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

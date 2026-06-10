@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rechner — ORBIT Immobilienrechner</title>
+  <meta name="description" content="Kaufnebenkosten, Mietrendite und Finanzierung live berechnen.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='38' fill='none' stroke='%23e3b95c' stroke-width='6'/><circle cx='50' cy='12' r='9' fill='%23e3b95c'/></svg>">
+</head>
+<body>
+<div class="stars" aria-hidden="true"></div>
+
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <a class="logo" href="index.html"><span class="logo-dot" aria-hidden="true"></span>ORBIT</a>
+    <div class="nav-links">
+      <a href="index.html">Start</a>
+      <a href="rechner.html" class="active">Rechner</a>
+      <a href="projekte.html">Projekte</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" style="padding: 70px 0 40px;">
+  <div class="wrap">
+    <p class="eyebrow">Mission Control</p>
+    <h1 style="font-size: clamp(2rem, 5vw, 3rem);">Die Rechner</h1>
+    <p class="lead">Werte eingeben, Ergebnis live verfolgen. Alle Berechnungen laufen lokal in deinem Browser.</p>
+  </div>
+</header>
+
+<main class="section" style="border-top: none; padding-top: 20px;">
+  <div class="wrap">
+
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-calc="nebenkosten" role="tab">01 · Kaufnebenkosten</button>
+      <button class="tab" data-calc="rendite" role="tab">02 · Mietrendite &amp; Cashflow</button>
+      <button class="tab" data-calc="finanzierung" role="tab">03 · Finanzierung</button>
+    </div>
+
+    <!-- ================= 01 KAUFNEBENKOSTEN ================= -->
+    <section class="calc active" id="calc-nebenkosten">
+      <div>
+        <div class="field">
+          <label for="nk-preis">Kaufpreis (€)</label>
+          <input type="number" id="nk-preis" value="400000" min="0" step="1000">
+        </div>
+        <div class="field">
+          <label for="nk-land">Bundesland (Grunderwerbsteuer)</label>
+          <select id="nk-land">
+            <option value="6.5">Brandenburg — 6,5 %</option>
+            <option value="6.5">Nordrhein-Westfalen — 6,5 %</option>
+            <option value="6.5">Saarland — 6,5 %</option>
+            <option value="6.5">Schleswig-Holstein — 6,5 %</option>
+            <option value="6.0">Berlin — 6,0 %</option>
+            <option value="6.0">Hessen — 6,0 %</option>
+            <option value="6.0">Mecklenburg-Vorpommern — 6,0 %</option>
+            <option value="5.5" selected>Hamburg — 5,5 %</option>
+            <option value="5.0">Baden-Württemberg — 5,0 %</option>
+            <option value="5.0">Bremen — 5,0 %</option>
+            <option value="5.0">Niedersachsen — 5,0 %</option>
+            <option value="5.0">Rheinland-Pfalz — 5,0 %</option>
+            <option value="5.0">Sachsen-Anhalt — 5,0 %</option>
+            <option value="5.0">Sachsen — 5,0 %</option>
+            <option value="5.0">Thüringen — 5,0 %</option>
+            <option value="3.5">Bayern — 3,5 %</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="nk-notar">Notar &amp; Grundbuch (%)</label>
+          <div class="range-row">
+            <input type="range" id="nk-notar" min="1" max="3" step="0.1" value="2.0">
+            <span class="range-val" id="nk-notar-val">2,0 %</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="nk-makler">Maklerprovision (%)</label>
+          <div class="range-row">
+            <input type="range" id="nk-makler" min="0" max="7.14" step="0.01" value="3.57">
+            <span class="range-val" id="nk-makler-val">3,57 %</span>
+          </div>
+        </div>
+      </div>
+
+      <aside class="results" aria-live="polite">
+        <p class="results-title">Ergebnis</p>
+        <div class="res-row"><span class="k">Grunderwerbsteuer</span><span class="v" id="nk-gest">—</span></div>
+        <div class="res-row"><span class="k">Notar &amp; Grundbuch</span><span class="v" id="nk-ng">—</span></div>
+        <div class="res-row"><span class="k">Makler</span><span class="v" id="nk-mk">—</span></div>
+        <div class="res-row"><span class="k">Nebenkosten gesamt</span><span class="v" id="nk-summe">—</span></div>
+        <div class="res-row"><span class="k">Nebenkostenquote</span><span class="v" id="nk-quote">—</span></div>
+        <div class="res-row big"><span class="k">Gesamtinvestition</span><span class="v" id="nk-total">—</span></div>
+        <p class="res-note">Richtwerte. Notar- und Grundbuchkosten liegen üblicherweise bei ca. 1,5–2 %, die Maklerprovision für Käufer häufig bei 3,57 % (inkl. MwSt.).</p>
+      </aside>
+    </section>
+
+    <!-- ================= 02 MIETRENDITE & CASHFLOW ================= -->
+    <section class="calc" id="calc-rendite">
+      <div>
+        <div class="field">
+          <label for="re-preis">Kaufpreis (€)</label>
+          <input type="number" id="re-preis" value="400000" min="0" step="1000">
+        </div>
+        <div class="field">
+          <label for="re-nk">Kaufnebenkosten (%)</label>
+          <div class="range-row">
+            <input type="range" id="re-nk" min="0" max="15" step="0.1" value="11.1">
+            <span class="range-val" id="re-nk-val">11,1 %</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="re-miete">Kaltmiete pro Monat (€)</label>
+          <input type="number" id="re-miete" value="1250" min="0" step="10">
+        </div>
+        <div class="field">
+          <label for="re-hausgeld">Nicht umlegbare Kosten pro Monat (€)</label>
+          <input type="number" id="re-hausgeld" value="120" min="0" step="5">
+        </div>
+        <div class="field">
+          <label for="re-ruecklage">Instandhaltungsrücklage pro Monat (€)</label>
+          <input type="number" id="re-ruecklage" value="80" min="0" step="5">
+        </div>
+        <div class="field">
+          <label for="re-rate">Monatliche Kreditrate (€) — optional</label>
+          <input type="number" id="re-rate" value="1480" min="0" step="10">
+        </div>
+      </div>
+
+      <aside class="results" aria-live="polite">
+        <p class="results-title">Ergebnis</p>
+        <div class="res-row"><span class="k">Jahreskaltmiete</span><span class="v" id="re-jkm">—</span></div>
+        <div class="res-row"><span class="k">Kaufpreisfaktor</span><span class="v" id="re-faktor">—</span></div>
+        <div class="res-row"><span class="k">Bruttomietrendite</span><span class="v" id="re-brutto">—</span></div>
+        <div class="res-row"><span class="k">Nettomietrendite</span><span class="v" id="re-netto">—</span></div>
+        <div class="res-row big"><span class="k">Cashflow / Monat</span><span class="v" id="re-cf">—</span></div>
+        <p class="res-note">Bruttorendite = Jahreskaltmiete ÷ Kaufpreis. Nettorendite bezieht Nebenkosten beim Kauf sowie laufende, nicht umlegbare Kosten ein. Cashflow vor Steuern.</p>
+      </aside>
+    </section>
+
+    <!-- ================= 03 FINANZIERUNG ================= -->
+    <section class="calc" id="calc-finanzierung">
+      <div>
+        <div class="field">
+          <label for="fi-darlehen">Darlehenssumme (€)</label>
+          <input type="number" id="fi-darlehen" value="360000" min="0" step="1000">
+        </div>
+        <div class="field">
+          <label for="fi-zins">Sollzins p. a. (%)</label>
+          <div class="range-row">
+            <input type="range" id="fi-zins" min="0.5" max="8" step="0.05" value="3.6">
+            <span class="range-val" id="fi-zins-val">3,60 %</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="fi-tilgung">Anfängliche Tilgung p. a. (%)</label>
+          <div class="range-row">
+            <input type="range" id="fi-tilgung" min="1" max="6" step="0.1" value="2.0">
+            <span class="range-val" id="fi-tilgung-val">2,0 %</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="fi-bindung">Zinsbindung (Jahre)</label>
+          <div class="range-row">
+            <input type="range" id="fi-bindung" min="5" max="30" step="1" value="10">
+            <span class="range-val" id="fi-bindung-val">10 J.</span>
+          </div>
+        </div>
+      </div>
+
+      <aside class="results" aria-live="polite">
+        <p class="results-title">Ergebnis</p>
+        <div class="res-row big"><span class="k">Monatsrate</span><span class="v" id="fi-rate">—</span></div>
+        <div class="res-row"><span class="k">Restschuld nach Zinsbindung</span><span class="v" id="fi-rest">—</span></div>
+        <div class="res-row"><span class="k">Getilgt in der Zinsbindung</span><span class="v" id="fi-getilgt">—</span></div>
+        <div class="res-row"><span class="k">Zinskosten in der Zinsbindung</span><span class="v" id="fi-zinskosten">—</span></div>
+        <div class="res-row"><span class="k">Gesamtlaufzeit (ca.)</span><span class="v" id="fi-laufzeit">—</span></div>
+        <p class="res-note">Annuitätendarlehen mit monatlicher Rate und gleichbleibendem Zins. Die Gesamtlaufzeit nimmt an, dass der Zins nach der Bindung unverändert bleibt.</p>
+      </aside>
+    </section>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <span>ORBIT — Immobilienrechner. Alle Angaben ohne Gewähr, keine Anlage- oder Steuerberatung.</span>
+    <span><a href="index.html">Start</a> · <a href="projekte.html">Projekte</a></span>
+  </div>
+</footer>
+
+<script src="assets/app.js"></script>
+</body>
+</html>
