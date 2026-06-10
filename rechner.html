@@ -321,6 +321,30 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   margin-top: 20px; font-size: 0.78rem; color: var(--faint); line-height: 1.55;
 }
 
+/* Chart */
+.chart-block {
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  padding: 30px 28px 20px;
+}
+.chart-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 16px; flex-wrap: wrap; margin-bottom: 24px;
+}
+.chart-head .results-title { margin-bottom: 0; }
+.chart-legend {
+  display: flex; gap: 18px;
+  font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted);
+}
+.chart-legend i {
+  display: inline-block; width: 10px; height: 10px;
+  border-radius: 3px; margin-right: 7px;
+}
+.chart-block svg text {
+  font-family: var(--font-mono); font-size: 11px; fill: var(--faint);
+}
+
 /* ============================================================
    Projekte
    ============================================================ */
@@ -524,6 +548,18 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
         <div class="res-row big"><span class="k">Cashflow / Monat</span><span class="v" id="re-cf">—</span></div>
         <p class="res-note">Bruttorendite = Jahreskaltmiete ÷ Kaufpreis. Nettorendite bezieht Nebenkosten beim Kauf sowie laufende, nicht umlegbare Kosten ein. Cashflow vor Steuern. Zins- und Tilgungsanteil beziehen sich nominal auf den ersten Monat — mit jeder Rate sinkt der Zins- und steigt der Tilgungsanteil.</p>
       </aside>
+
+      <div class="chart-block" id="re-chart-block" style="grid-column: 1 / -1;">
+        <div class="chart-head">
+          <p class="results-title">Zins &amp; Tilgung — die nächsten 10 Jahre</p>
+          <div class="chart-legend">
+            <span><i style="background: var(--accent)"></i>Tilgung</span>
+            <span><i style="background: #e07a6a"></i>Zins</span>
+          </div>
+        </div>
+        <div id="re-chart" aria-hidden="false"></div>
+        <p class="res-note" id="re-chart-note"></p>
+      </div>
     </section>
 
     <!-- ================= 03 FINANZIERUNG ================= -->
@@ -757,6 +793,63 @@ function calcRendite() {
   setVal("re-cf", cf, (v) => (v > 0 ? "+" : "") + fmtEUR.format(v));
   cfEl.classList.toggle("neg", cf < 0);
   cfEl.classList.toggle("pos", cf > 0);
+
+  renderReChart(darlehen, zinsP, rate);
+}
+
+/* --------- Balkendiagramm: Zins/Tilgung pro Jahr --------- */
+function renderReChart(darlehen, zinsP, rate) {
+  const block = $("re-chart-block");
+  if (!block) return;
+  if (darlehen <= 0 || rate <= 0) {
+    block.style.display = "none";
+    return;
+  }
+  block.style.display = "";
+
+  const zinsMonat = zinsP / 100 / 12;
+  let rest = darlehen;
+  const years = [];
+  for (let y = 1; y <= 10; y++) {
+    let z = 0, t = 0;
+    for (let m = 0; m < 12; m++) {
+      if (rest <= 0) break;
+      const zins = rest * zinsMonat;
+      const tilgung = Math.min(Math.max(rate - zins, 0), rest);
+      z += zins;
+      t += tilgung;
+      rest -= tilgung;
+    }
+    if (z === 0 && t === 0) break;
+    years.push({ y, z, t });
+  }
+
+  const max = Math.max(...years.map((d) => d.z + d.t), 1);
+  const W = 640, top = 12, bottom = 200, labelY = 226;
+  const slot = W / 10;
+  const barW = Math.min(38, slot * 0.6);
+  let bars = "";
+
+  years.forEach((d, i) => {
+    const x = i * slot + (slot - barW) / 2;
+    const hT = ((bottom - top) * d.t) / max;
+    const hZ = ((bottom - top) * d.z) / max;
+    const yT = bottom - hT;
+    const yZ = yT - hZ;
+    bars += `<g><title>Jahr ${d.y} — Zins: ${fmtEUR.format(d.z)} · Tilgung: ${fmtEUR.format(d.t)}</title>` +
+      `<rect x="${x}" y="${yT}" width="${barW}" height="${hT}" style="fill: var(--accent)"></rect>` +
+      `<rect x="${x}" y="${yZ}" width="${barW}" height="${hZ}" rx="2" style="fill: #e07a6a; opacity: 0.85"></rect>` +
+      `<text x="${x + barW / 2}" y="${labelY}" text-anchor="middle">J${d.y}</text></g>`;
+  });
+  bars += `<line x1="0" y1="${bottom}" x2="${W}" y2="${bottom}" style="stroke: var(--line)"></line>`;
+
+  $("re-chart").innerHTML =
+    `<svg viewBox="0 0 ${W} 240" width="100%" role="img" aria-label="Jährliche Aufteilung der Kreditrate in Zins und Tilgung über zehn Jahre">${bars}</svg>`;
+
+  $("re-chart-note").textContent =
+    rest <= 0
+      ? `Das Darlehen ist innerhalb der 10 Jahre vollständig getilgt. Werte pro Balken per Mauszeiger.`
+      : `Restschuld nach 10 Jahren: ${fmtEUR.format(rest)}. Werte pro Balken per Mauszeiger.`;
 }
 
 /* ============================================================
