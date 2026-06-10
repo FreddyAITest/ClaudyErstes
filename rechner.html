@@ -411,6 +411,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
       <button class="tab active" data-calc="nebenkosten" role="tab">01 · Kaufnebenkosten</button>
       <button class="tab" data-calc="rendite" role="tab">02 · Mietrendite &amp; Cashflow</button>
       <button class="tab" data-calc="finanzierung" role="tab">03 · Finanzierung</button>
+      <button class="tab" data-calc="bonitaet" role="tab">04 · Haushalt &amp; Bonität</button>
     </div>
 
     <!-- ================= 01 KAUFNEBENKOSTEN ================= -->
@@ -553,6 +554,59 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
       </aside>
     </section>
 
+    <!-- ================= 04 HAUSHALT & BONITÄT ================= -->
+    <section class="calc" id="calc-bonitaet">
+      <div>
+        <div class="field">
+          <label for="bo-netto">Haushaltsnettoeinkommen pro Monat (€)</label>
+          <input type="number" id="bo-netto" value="4500" min="0" step="50">
+        </div>
+        <div class="field">
+          <label for="bo-sonstige">Sonstige Einnahmen pro Monat (€) — z. B. Miete, Kindergeld</label>
+          <input type="number" id="bo-sonstige" value="0" min="0" step="10">
+        </div>
+        <div class="field">
+          <label for="bo-raten">Bestehende Kreditraten pro Monat (€)</label>
+          <input type="number" id="bo-raten" value="0" min="0" step="10">
+        </div>
+        <div class="field">
+          <label for="bo-neurate">Geplante neue Kreditrate pro Monat (€)</label>
+          <input type="number" id="bo-neurate" value="1480" min="0" step="10">
+        </div>
+        <div class="field">
+          <label for="bo-schulden">Bestehende Restschulden gesamt (€)</label>
+          <input type="number" id="bo-schulden" value="0" min="0" step="1000">
+        </div>
+        <div class="field">
+          <label for="bo-darlehen">Neue Darlehenssumme (€)</label>
+          <input type="number" id="bo-darlehen" value="360000" min="0" step="1000">
+        </div>
+        <div class="field">
+          <label for="bo-marktwert">Kaufpreis / Marktwert der Immobilie (€)</label>
+          <input type="number" id="bo-marktwert" value="400000" min="0" step="1000">
+        </div>
+        <div class="field">
+          <label for="bo-abschlag">Sicherheitsabschlag Beleihungswert (%)</label>
+          <div class="range-row">
+            <input type="range" id="bo-abschlag" min="0" max="25" step="0.5" value="10">
+            <span class="range-val" id="bo-abschlag-val">10,0 %</span>
+          </div>
+        </div>
+      </div>
+
+      <aside class="results" aria-live="polite">
+        <p class="results-title">Ergebnis</p>
+        <div class="res-row"><span class="k">Gesamteinkommen / Monat</span><span class="v" id="bo-einkommen">—</span></div>
+        <div class="res-row"><span class="k">Kreditraten gesamt / Monat</span><span class="v" id="bo-ratensumme">—</span></div>
+        <div class="res-row big"><span class="k">DSTI (Schuldendienstquote)</span><span class="v" id="bo-dsti">—</span></div>
+        <div class="res-row"><span class="k">DTI (Verschuldung ÷ Jahresnetto)</span><span class="v" id="bo-dti">—</span></div>
+        <div class="res-row"><span class="k">Beleihungswert</span><span class="v" id="bo-belwert">—</span></div>
+        <div class="res-row"><span class="k">Beleihungsauslauf (LTV)</span><span class="v" id="bo-ltv">—</span></div>
+        <div class="res-row"><span class="k">Frei verfügbar / Monat</span><span class="v" id="bo-frei">—</span></div>
+        <p class="res-note">DSTI = alle Kreditraten ÷ Nettoeinkommen; Banken sehen Werte bis ca. 35 % als komfortabel, über 40 % wird es eng. DTI = Gesamtverschuldung ÷ Jahresnettoeinkommen. Beleihungswert = Marktwert abzüglich Sicherheitsabschlag; ein Beleihungsauslauf bis 80 % gilt meist als günstig für die Konditionen.</p>
+      </aside>
+    </section>
+
   </div>
 </main>
 
@@ -625,7 +679,7 @@ if (tabs.length) {
   }
   tabs.forEach((t) => t.addEventListener("click", () => activate(t.dataset.calc)));
   const hash = location.hash.replace("#", "");
-  if (["nebenkosten", "rendite", "finanzierung"].includes(hash)) activate(hash);
+  if (["nebenkosten", "rendite", "finanzierung", "bonitaet"].includes(hash)) activate(hash);
 }
 
 /* ============================================================
@@ -738,6 +792,52 @@ function calcFinanzierung() {
 }
 
 /* ============================================================
+   04 — Haushalt & Bonität (DSTI, DTI, Beleihungswert)
+   ============================================================ */
+function calcBonitaet() {
+  if (!$("bo-netto")) return;
+  const netto = num("bo-netto");
+  const sonstige = num("bo-sonstige");
+  const raten = num("bo-raten");
+  const neurate = num("bo-neurate");
+  const schulden = num("bo-schulden");
+  const darlehen = num("bo-darlehen");
+  const marktwert = num("bo-marktwert");
+  const abschlagP = num("bo-abschlag");
+
+  $("bo-abschlag-val").textContent = fmtNum.format(abschlagP) + " %";
+
+  const einkommen = netto + sonstige;
+  const ratensumme = raten + neurate;
+  const dsti = einkommen > 0 ? (ratensumme / einkommen) * 100 : 0;
+  const jahresnetto = einkommen * 12;
+  const gesamtschuld = schulden + darlehen;
+  const dti = jahresnetto > 0 ? gesamtschuld / jahresnetto : 0;
+  const belwert = marktwert * (1 - abschlagP / 100);
+  const ltv = belwert > 0 ? (darlehen / belwert) * 100 : 0;
+  const frei = einkommen - ratensumme;
+
+  setVal("bo-einkommen", einkommen, (v) => fmtEUR.format(v));
+  setVal("bo-ratensumme", ratensumme, (v) => fmtEUR.format(v));
+  setVal("bo-dsti", dsti, (v) => fmtPct.format(v), " %");
+  setVal("bo-dti", dti, (v) => fmtNum.format(v), " × Jahresnetto");
+  setVal("bo-belwert", belwert, (v) => fmtEUR.format(v));
+  setVal("bo-ltv", ltv, (v) => fmtPct.format(v), " %");
+  setVal("bo-frei", frei, (v) => fmtEUR.format(v));
+
+  const dstiEl = $("bo-dsti");
+  dstiEl.classList.toggle("pos", einkommen > 0 && dsti <= 35);
+  dstiEl.classList.toggle("neg", dsti > 40);
+
+  const ltvEl = $("bo-ltv");
+  ltvEl.classList.toggle("pos", belwert > 0 && ltv <= 80);
+  ltvEl.classList.toggle("neg", ltv > 100);
+
+  const freiEl = $("bo-frei");
+  freiEl.classList.toggle("neg", frei < 0);
+}
+
+/* ============================================================
    Events & Init
    ============================================================ */
 document.querySelectorAll("input, select").forEach((el) => {
@@ -745,11 +845,13 @@ document.querySelectorAll("input, select").forEach((el) => {
     calcNebenkosten();
     calcRendite();
     calcFinanzierung();
+    calcBonitaet();
   });
 });
 calcNebenkosten();
 calcRendite();
 calcFinanzierung();
+calcBonitaet();
 
 /* Scroll-Reveal */
 const reveals = document.querySelectorAll(".reveal");
