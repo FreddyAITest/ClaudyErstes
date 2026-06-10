@@ -1,6 +1,6 @@
 # ORBIT — Immobilienrechner
 
-Minimalistische, „abgespacete" Website mit drei Immobilienrechnern und durchgerechneten Beispielprojekten. Reines HTML — CSS und JavaScript sind direkt in jede Seite eingebettet. Kein Build-Step, keine externen Dateien, deploy-sicher.
+Minimalistische, „abgespacete" Website mit drei Immobilienrechnern und durchgerechneten Beispielprojekten. Reines HTML/CSS/JS — kein Build-Step, keine Dependencies.
 
 ## Seiten
 

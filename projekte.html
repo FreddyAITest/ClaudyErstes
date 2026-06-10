@@ -8,7 +8,378 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Instrument+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css">
+  <style>
+/* ============================================================
+   ORBIT — Immobilienrechner
+   Tokens
+   ============================================================ */
+:root {
+  --void: #0a0a12;
+  --surface: #11111d;
+  --surface-2: #16162405;
+  --line: #232338;
+  --line-soft: #1a1a2c;
+  --ink: #e9e7f4;
+  --muted: #8d8ba8;
+  --faint: #56546e;
+  --accent: #e3b95c;
+  --accent-dim: #e3b95c33;
+  --radius: 14px;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Instrument Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+  --max: 1080px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--void);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16.5px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection { background: var(--accent); color: var(--void); }
+
+a { color: inherit; text-decoration: none; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+
+/* ============================================================
+   Sternenfeld (sehr subtil)
+   ============================================================ */
+.stars {
+  position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 12% 22%, #ffffff55 50%, transparent 51%),
+    radial-gradient(1px 1px at 78% 14%, #ffffff40 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 64% 68%, #ffffff30 50%, transparent 51%),
+    radial-gradient(1px 1px at 32% 84%, #ffffff45 50%, transparent 51%),
+    radial-gradient(1px 1px at 90% 52%, #ffffff35 50%, transparent 51%),
+    radial-gradient(1px 1px at 45% 38%, #ffffff28 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 8% 62%, #ffffff2e 50%, transparent 51%);
+}
+
+/* ============================================================
+   Navigation
+   ============================================================ */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  backdrop-filter: blur(14px);
+  background: #0a0a12cc;
+  border-bottom: 1px solid var(--line-soft);
+}
+.nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 64px;
+}
+.logo {
+  font-family: var(--font-display);
+  font-weight: 700; letter-spacing: 0.22em; font-size: 0.95rem;
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  position: relative;
+}
+.logo-dot::after {
+  content: ""; position: absolute; top: -2.5px; left: 50%;
+  width: 3px; height: 3px; border-radius: 50%; background: var(--accent);
+  transform: translateX(-50%);
+}
+.nav-links { display: flex; gap: 28px; font-size: 0.86rem; color: var(--muted); }
+.nav-links a { transition: color 0.2s; }
+.nav-links a:hover, .nav-links a.active { color: var(--ink); }
+.nav-links a.active { color: var(--accent); }
+
+/* ============================================================
+   Hero mit Orbit-Signatur
+   ============================================================ */
+.hero {
+  position: relative;
+  padding: 110px 0 90px;
+  text-align: center;
+  overflow: hidden;
+}
+.orbits {
+  position: absolute; top: 50%; left: 50%;
+  width: 920px; height: 920px;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  opacity: 0.9;
+}
+.orbit-ring {
+  position: absolute; top: 50%; left: 50%;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.orbit-ring .sat {
+  position: absolute; top: -3.5px; left: 50%;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent);
+  transform: translateX(-50%);
+}
+.ring-1 { width: 380px; height: 380px; animation: spin 48s linear infinite; }
+.ring-2 { width: 600px; height: 600px; animation: spin 84s linear infinite reverse; }
+.ring-3 { width: 860px; height: 860px; animation: spin 130s linear infinite; }
+.ring-2 .sat { background: var(--muted); box-shadow: none; width: 5px; height: 5px; }
+.ring-3 .sat { background: var(--faint); box-shadow: none; width: 5px; height: 5px; }
+
+@keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ring-1, .ring-2, .ring-3 { animation: none; }
+  html { scroll-behavior: auto; }
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem; letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 22px;
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 6vw, 4.2rem);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  max-width: 760px;
+  margin: 0 auto 24px;
+}
+.hero h1 em {
+  font-style: normal; color: var(--accent);
+}
+.hero p.lead {
+  color: var(--muted);
+  max-width: 540px;
+  margin: 0 auto 38px;
+  font-size: 1.05rem;
+}
+.cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-display);
+  font-size: 0.9rem; font-weight: 500; letter-spacing: 0.04em;
+  padding: 13px 26px;
+  border-radius: 100px;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.15s;
+  cursor: pointer;
+  background: transparent;
+}
+.btn:hover { border-color: var(--muted); transform: translateY(-1px); }
+.btn.primary {
+  background: var(--accent); color: var(--void); border-color: var(--accent);
+}
+.btn.primary:hover { background: #efc96f; }
+
+/* ============================================================
+   Sektionen
+   ============================================================ */
+.section { padding: 90px 0; border-top: 1px solid var(--line-soft); }
+.section-head { margin-bottom: 48px; max-width: 560px; }
+.section-head h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3.4vw, 2.2rem);
+  font-weight: 500; letter-spacing: -0.01em;
+  margin: 10px 0 14px;
+}
+.section-head p { color: var(--muted); }
+
+/* Karten */
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+@media (max-width: 860px) { .grid-3 { grid-template-columns: 1fr; } }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  padding: 30px 26px;
+  position: relative;
+  transition: border-color 0.25s, transform 0.25s;
+  display: block;
+}
+.card:hover { border-color: var(--accent-dim); transform: translateY(-3px); }
+.card .card-id {
+  font-family: var(--font-mono);
+  font-size: 0.7rem; color: var(--faint); letter-spacing: 0.2em;
+}
+.card h3 {
+  font-family: var(--font-display);
+  font-weight: 500; font-size: 1.18rem;
+  margin: 14px 0 10px;
+}
+.card p { color: var(--muted); font-size: 0.93rem; }
+.card .card-go {
+  margin-top: 22px;
+  font-family: var(--font-mono); font-size: 0.78rem;
+  color: var(--accent); letter-spacing: 0.08em;
+}
+
+/* ============================================================
+   Rechner
+   ============================================================ */
+.tabs {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 42px;
+}
+.tab {
+  font-family: var(--font-display); font-size: 0.88rem;
+  padding: 10px 20px; border-radius: 100px;
+  border: 1px solid var(--line); background: transparent; color: var(--muted);
+  cursor: pointer; transition: all 0.2s;
+}
+.tab:hover { color: var(--ink); }
+.tab.active { background: var(--accent); border-color: var(--accent); color: var(--void); }
+
+.calc { display: none; }
+.calc.active { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; animation: fadeUp 0.4s ease; }
+@media (max-width: 860px) { .calc.active { grid-template-columns: 1fr; } }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+.field { margin-bottom: 22px; }
+.field label {
+  display: block;
+  font-family: var(--font-mono); font-size: 0.72rem;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 9px;
+}
+.field input, .field select {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  font-family: var(--font-mono); font-size: 1rem;
+  padding: 13px 16px;
+  transition: border-color 0.2s;
+  appearance: none;
+}
+.field input:focus, .field select:focus { border-color: var(--accent); outline: none; }
+.field .range-row { display: flex; align-items: center; gap: 16px; }
+.field input[type="range"] {
+  padding: 0; height: 2px; background: var(--line); border: none;
+  accent-color: var(--accent); cursor: pointer;
+}
+.field .range-val {
+  font-family: var(--font-mono); min-width: 84px; text-align: right;
+  color: var(--accent); font-size: 0.95rem;
+}
+
+/* Ergebnis-Panel */
+.results {
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  padding: 34px 30px;
+  align-self: start;
+  position: sticky; top: 90px;
+}
+.results .results-title {
+  font-family: var(--font-mono); font-size: 0.72rem;
+  letter-spacing: 0.24em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 26px;
+}
+.res-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line-soft);
+  gap: 16px;
+}
+.res-row:last-child { border-bottom: none; }
+.res-row .k { color: var(--muted); font-size: 0.88rem; }
+.res-row .v {
+  font-family: var(--font-mono); font-size: 1.02rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.res-row.big .v { font-size: 1.5rem; color: var(--accent); }
+.res-row .v.neg { color: #e07a6a; }
+.res-row .v.pos { color: #8fd49a; }
+.res-note {
+  margin-top: 20px; font-size: 0.78rem; color: var(--faint); line-height: 1.55;
+}
+
+/* ============================================================
+   Projekte
+   ============================================================ */
+.project {
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  padding: 36px 32px;
+  margin-bottom: 22px;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 36px;
+}
+@media (max-width: 860px) { .project { grid-template-columns: 1fr; } }
+.project .p-tag {
+  font-family: var(--font-mono); font-size: 0.7rem;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent);
+}
+.project h3 {
+  font-family: var(--font-display); font-weight: 500;
+  font-size: 1.5rem; margin: 12px 0 12px; letter-spacing: -0.01em;
+}
+.project .p-desc { color: var(--muted); font-size: 0.94rem; }
+.p-metrics {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+  background: var(--line-soft); border-radius: 10px; overflow: hidden;
+  align-self: center;
+}
+.p-metric { background: var(--void); padding: 18px 20px; }
+.p-metric .mk {
+  font-family: var(--font-mono); font-size: 0.66rem;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--faint);
+}
+.p-metric .mv {
+  font-family: var(--font-mono); font-size: 1.15rem; margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.p-metric .mv.gold { color: var(--accent); }
+
+/* ============================================================
+   Footer
+   ============================================================ */
+.footer {
+  border-top: 1px solid var(--line-soft);
+  padding: 44px 0 60px;
+  color: var(--faint);
+  font-size: 0.82rem;
+}
+.footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.footer a:hover { color: var(--muted); }
+
+/* Reveal on scroll */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+</style>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='38' fill='none' stroke='%23e3b95c' stroke-width='6'/><circle cx='50' cy='12' r='9' fill='%23e3b95c'/></svg>">
 </head>
 <body>
@@ -121,6 +492,208 @@
   </div>
 </footer>
 
-<script src="assets/app.js"></script>
+<script>
+/* ============================================================
+   ORBIT — Immobilienrechner
+   ============================================================ */
+
+const fmtEUR = new Intl.NumberFormat("de-DE", {
+  style: "currency", currency: "EUR", maximumFractionDigits: 0,
+});
+const fmtEUR2 = new Intl.NumberFormat("de-DE", {
+  style: "currency", currency: "EUR", minimumFractionDigits: 2, maximumFractionDigits: 2,
+});
+const fmtPct = new Intl.NumberFormat("de-DE", {
+  minimumFractionDigits: 2, maximumFractionDigits: 2,
+});
+const fmtNum = new Intl.NumberFormat("de-DE", {
+  minimumFractionDigits: 1, maximumFractionDigits: 1,
+});
+
+const $ = (id) => document.getElementById(id);
+const num = (id) => parseFloat($(id)?.value) || 0;
+
+/* --------- sanfte Zähl-Animation für Ergebniswerte --------- */
+const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const animState = new Map();
+
+function setVal(id, value, formatter, suffix = "") {
+  const el = $(id);
+  if (!el) return;
+  if (prefersReduced) {
+    el.textContent = formatter(value) + suffix;
+    animState.set(id, value);
+    return;
+  }
+  const from = animState.get(id) ?? value;
+  animState.set(id, value);
+  if (from === value) { el.textContent = formatter(value) + suffix; return; }
+
+  const start = performance.now();
+  const dur = 350;
+  function frame(now) {
+    const t = Math.min((now - start) / dur, 1);
+    const eased = 1 - Math.pow(1 - t, 3);
+    el.textContent = formatter(from + (value - from) * eased) + suffix;
+    if (t < 1 && animState.get(id) === value) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ============================================================
+   Tabs
+   ============================================================ */
+const tabs = document.querySelectorAll(".tab");
+if (tabs.length) {
+  function activate(name) {
+    tabs.forEach((t) => t.classList.toggle("active", t.dataset.calc === name));
+    document.querySelectorAll(".calc").forEach((c) =>
+      c.classList.toggle("active", c.id === "calc-" + name)
+    );
+    history.replaceState(null, "", "#" + name);
+  }
+  tabs.forEach((t) => t.addEventListener("click", () => activate(t.dataset.calc)));
+  const hash = location.hash.replace("#", "");
+  if (["nebenkosten", "rendite", "finanzierung"].includes(hash)) activate(hash);
+}
+
+/* ============================================================
+   01 — Kaufnebenkosten
+   ============================================================ */
+function calcNebenkosten() {
+  if (!$("nk-preis")) return;
+  const preis = num("nk-preis");
+  const gestP = num("nk-land");
+  const notarP = num("nk-notar");
+  const maklerP = num("nk-makler");
+
+  $("nk-notar-val").textContent = fmtNum.format(notarP) + " %";
+  $("nk-makler-val").textContent = fmtPct.format(maklerP) + " %";
+
+  const gest = (preis * gestP) / 100;
+  const ng = (preis * notarP) / 100;
+  const mk = (preis * maklerP) / 100;
+  const summe = gest + ng + mk;
+
+  setVal("nk-gest", gest, (v) => fmtEUR.format(v));
+  setVal("nk-ng", ng, (v) => fmtEUR.format(v));
+  setVal("nk-mk", mk, (v) => fmtEUR.format(v));
+  setVal("nk-summe", summe, (v) => fmtEUR.format(v));
+  setVal("nk-quote", preis ? (summe / preis) * 100 : 0, (v) => fmtPct.format(v), " %");
+  setVal("nk-total", preis + summe, (v) => fmtEUR.format(v));
+}
+
+/* ============================================================
+   02 — Mietrendite & Cashflow
+   ============================================================ */
+function calcRendite() {
+  if (!$("re-preis")) return;
+  const preis = num("re-preis");
+  const nkP = num("re-nk");
+  const miete = num("re-miete");
+  const hausgeld = num("re-hausgeld");
+  const ruecklage = num("re-ruecklage");
+  const rate = num("re-rate");
+
+  $("re-nk-val").textContent = fmtNum.format(nkP) + " %";
+
+  const invest = preis * (1 + nkP / 100);
+  const jkm = miete * 12;
+  const jahresNetto = jkm - (hausgeld + ruecklage) * 12;
+  const cf = miete - hausgeld - ruecklage - rate;
+
+  setVal("re-jkm", jkm, (v) => fmtEUR.format(v));
+  setVal("re-faktor", jkm > 0 ? preis / jkm : 0, (v) => fmtNum.format(v));
+  setVal("re-brutto", preis ? (jkm / preis) * 100 : 0, (v) => fmtPct.format(v), " %");
+  setVal("re-netto", invest ? (jahresNetto / invest) * 100 : 0, (v) => fmtPct.format(v), " %");
+
+  const cfEl = $("re-cf");
+  setVal("re-cf", cf, (v) => (v > 0 ? "+" : "") + fmtEUR.format(v));
+  cfEl.classList.toggle("neg", cf < 0);
+  cfEl.classList.toggle("pos", cf > 0);
+}
+
+/* ============================================================
+   03 — Finanzierung (Annuitätendarlehen)
+   ============================================================ */
+function calcFinanzierung() {
+  if (!$("fi-darlehen")) return;
+  const darlehen = num("fi-darlehen");
+  const zinsP = num("fi-zins");
+  const tilgungP = num("fi-tilgung");
+  const bindung = num("fi-bindung");
+
+  $("fi-zins-val").textContent = fmtPct.format(zinsP) + " %";
+  $("fi-tilgung-val").textContent = fmtNum.format(tilgungP) + " %";
+  $("fi-bindung-val").textContent = bindung + " J.";
+
+  const annuitaet = (darlehen * (zinsP + tilgungP)) / 100;
+  const rate = annuitaet / 12;
+  const zinsM = zinsP / 100 / 12;
+
+  // Monatliche Simulation
+  let rest = darlehen;
+  let zinskosten = 0;
+  let monate = 0;
+  let restNachBindung = darlehen;
+  const maxMonate = 12 * 80;
+
+  while (rest > 0 && monate < maxMonate && rate > rest * zinsM) {
+    const zins = rest * zinsM;
+    const tilgung = Math.min(rate - zins, rest);
+    rest -= tilgung;
+    monate++;
+    if (monate <= bindung * 12) {
+      zinskosten += zins;
+      restNachBindung = rest;
+    }
+  }
+
+  const tilgtBindung = darlehen - restNachBindung;
+  const jahre = Math.floor(monate / 12);
+  const restMonate = monate % 12;
+  const abbezahlt = rest <= 0 && monate < maxMonate;
+
+  setVal("fi-rate", rate, (v) => fmtEUR2.format(v));
+  setVal("fi-rest", restNachBindung, (v) => fmtEUR.format(v));
+  setVal("fi-getilgt", tilgtBindung, (v) => fmtEUR.format(v));
+  setVal("fi-zinskosten", zinskosten, (v) => fmtEUR.format(v));
+  $("fi-laufzeit").textContent =
+    rate <= darlehen * zinsM && darlehen > 0
+      ? "Rate deckt Zins nicht"
+      : abbezahlt
+        ? `${jahre} J. ${restMonate} M.`
+        : "> 80 Jahre";
+}
+
+/* ============================================================
+   Events & Init
+   ============================================================ */
+document.querySelectorAll("input, select").forEach((el) => {
+  el.addEventListener("input", () => {
+    calcNebenkosten();
+    calcRendite();
+    calcFinanzierung();
+  });
+});
+calcNebenkosten();
+calcRendite();
+calcFinanzierung();
+
+/* Scroll-Reveal */
+const reveals = document.querySelectorAll(".reveal");
+if (reveals.length && "IntersectionObserver" in window && !prefersReduced) {
+  const io = new IntersectionObserver(
+    (entries) => entries.forEach((e) => {
+      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+    }),
+    { threshold: 0.12 }
+  );
+  reveals.forEach((r) => io.observe(r));
+} else {
+  reveals.forEach((r) => r.classList.add("in"));
+}
+
+</script>
 </body>
 </html>
