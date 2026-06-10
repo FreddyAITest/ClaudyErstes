@@ -500,6 +500,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
           <label for="re-rate">Monatliche Kreditrate (€) — optional</label>
           <input type="number" id="re-rate" value="1480" min="0" step="10">
         </div>
+        <div class="field">
+          <label for="re-darlehen">Darlehenssumme (€) — für Zins-/Tilgungsanteil</label>
+          <input type="number" id="re-darlehen" value="360000" min="0" step="1000">
+        </div>
+        <div class="field">
+          <label for="re-zins">Sollzins p. a. (%)</label>
+          <div class="range-row">
+            <input type="range" id="re-zins" min="0.5" max="8" step="0.05" value="3.6">
+            <span class="range-val" id="re-zins-val">3,60 %</span>
+          </div>
+        </div>
       </div>
 
       <aside class="results" aria-live="polite">
@@ -508,8 +519,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
         <div class="res-row"><span class="k">Kaufpreisfaktor</span><span class="v" id="re-faktor">—</span></div>
         <div class="res-row"><span class="k">Bruttomietrendite</span><span class="v" id="re-brutto">—</span></div>
         <div class="res-row"><span class="k">Nettomietrendite</span><span class="v" id="re-netto">—</span></div>
+        <div class="res-row"><span class="k">Zinsanteil / Monat (anfängl.)</span><span class="v" id="re-zinsanteil">—</span></div>
+        <div class="res-row"><span class="k">Tilgungsanteil / Monat (anfängl.)</span><span class="v" id="re-tilgungsanteil">—</span></div>
         <div class="res-row big"><span class="k">Cashflow / Monat</span><span class="v" id="re-cf">—</span></div>
-        <p class="res-note">Bruttorendite = Jahreskaltmiete ÷ Kaufpreis. Nettorendite bezieht Nebenkosten beim Kauf sowie laufende, nicht umlegbare Kosten ein. Cashflow vor Steuern.</p>
+        <p class="res-note">Bruttorendite = Jahreskaltmiete ÷ Kaufpreis. Nettorendite bezieht Nebenkosten beim Kauf sowie laufende, nicht umlegbare Kosten ein. Cashflow vor Steuern. Zins- und Tilgungsanteil beziehen sich nominal auf den ersten Monat — mit jeder Rate sinkt der Zins- und steigt der Tilgungsanteil.</p>
       </aside>
     </section>
 
@@ -719,18 +732,26 @@ function calcRendite() {
   const hausgeld = num("re-hausgeld");
   const ruecklage = num("re-ruecklage");
   const rate = num("re-rate");
+  const darlehen = num("re-darlehen");
+  const zinsP = num("re-zins");
 
   $("re-nk-val").textContent = fmtNum.format(nkP) + " %";
+  $("re-zins-val").textContent = fmtPct.format(zinsP) + " %";
 
   const invest = preis * (1 + nkP / 100);
   const jkm = miete * 12;
   const jahresNetto = jkm - (hausgeld + ruecklage) * 12;
   const cf = miete - hausgeld - ruecklage - rate;
 
+  const zinsanteil = Math.min((darlehen * zinsP) / 100 / 12, rate);
+  const tilgungsanteil = rate - zinsanteil;
+
   setVal("re-jkm", jkm, (v) => fmtEUR.format(v));
   setVal("re-faktor", jkm > 0 ? preis / jkm : 0, (v) => fmtNum.format(v));
   setVal("re-brutto", preis ? (jkm / preis) * 100 : 0, (v) => fmtPct.format(v), " %");
   setVal("re-netto", invest ? (jahresNetto / invest) * 100 : 0, (v) => fmtPct.format(v), " %");
+  setVal("re-zinsanteil", zinsanteil, (v) => fmtEUR2.format(v));
+  setVal("re-tilgungsanteil", tilgungsanteil, (v) => fmtEUR2.format(v));
 
   const cfEl = $("re-cf");
   setVal("re-cf", cf, (v) => (v > 0 ? "+" : "") + fmtEUR.format(v));
